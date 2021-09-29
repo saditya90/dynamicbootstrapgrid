@@ -1,0 +1,22 @@
+﻿
+@if (Model.IsCurrentSorted)
+{
+    <th class="col-header" data-col="@Model.DataColumnName" data-dir="@(Model.IsAsc? "asc" : "desc")">
+        @Model.ColumnName
+        @if (Model.IsAsc)
+        {
+            <i class="bi bi-sort-up"></i>
+        }
+        else
+        {
+            <i class="bi bi-sort-down"></i>
+        }
+    </th>
+}
+else
+{
+    <th class="col-header" data-col="@Model.DataColumnName" data-dir="">
+        @Model.ColumnName
+    </th>
+}
+

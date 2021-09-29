@@ -1,0 +1,81 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Home page";
+}
+
+<h2>Employees</h2>
+<div class="row mt-2">
+    <div class="col-sm-12 col-xl-12">
+        <form method="post" id="form-pagination">
+            <input type="search" asp-for="GridParams.Search" class="mb-2" autocomplete="off" />
+            <input type="hidden" asp-for="GridParams.Current" />
+            <input type="hidden" asp-for="GridParams.Total" />
+            <input type="hidden" asp-for="GridParams.Col" />
+            <input type="hidden" asp-for="GridParams.Dir" />
+            <input type="submit" id="btn-form-pagination" class="d-none" />
+        </form>
+        <div class="table-responsive">
+            <table class="table table-bordered border-primary">
+                <thead>
+                    <tr>
+                        <vc:tab-header col="Name" d-col="Name" sort-col="@Model.GridParams.Col" dir="@Model.GridParams.Dir"></vc:tab-header>
+                        <vc:tab-header col="Country" d-col="Country" sort-col="@Model.GridParams.Col" dir="@Model.GridParams.Dir"></vc:tab-header>
+                        <vc:tab-header col="Phone" d-col="PhoneNumber" sort-col="@Model.GridParams.Col" dir="@Model.GridParams.Dir"></vc:tab-header>
+                        <vc:tab-header col="Security" d-col="SecurityNo" sort-col="@Model.GridParams.Col" dir="@Model.GridParams.Dir"></vc:tab-header>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Data.Count > 0)
+                    {
+                        foreach (var employee in Model.Data)
+                        {
+                            <tr>
+                                <td>@employee.Name</td>
+                                <td>@employee.Country</td>
+                                <td>@employee.PhoneNumber</td>
+                                <td>@employee.SecurityNo</td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="4">
+                                <div class="alert alert-primary" role="alert">
+                                    No results found.
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        @if (Model.Pagination.Items.Count > 0)
+        {
+            <vc:pagination-nav pagination="Model.Pagination"></vc:pagination-nav>
+        }
+    </div>
+</div>
+@section Scripts
+{
+    <script>
+        $(document).on("click", "a.page-link", function () {
+            let $this = $(this);
+            if (!$this.parent("li").hasClass("active")) {
+                $("#GridParams_Current").val($this.data("page"));
+                $("#btn-form-pagination").click();
+            }
+        });
+        $(document).on("click", "th.col-header", function () {
+            let $this = $(this); let dir = "";
+            if ($this.data("dir") === "") {
+                dir = "asc";
+            }
+            dir = $this.data("dir") === "" ? dir : $this.data("dir") === "asc" ? "desc" : "asc";
+            $("#GridParams_Dir").val(dir);
+            $("#GridParams_Col").val($this.data("col"));
+            $("#btn-form-pagination").click();
+        });
+    </script>
+}

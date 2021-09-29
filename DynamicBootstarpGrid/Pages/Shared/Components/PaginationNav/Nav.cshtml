@@ -1,0 +1,27 @@
+﻿@model Models.Pagination
+
+<nav aria-label="nav-pagination" class="float-sm-end">
+    <ul class="pagination">
+        <li class="page-item @(Model.DisablePrev)">
+            <a class="page-link" data-page="@(Model.Prev)" href="javascript:void(0)">Previous</a>
+        </li>
+        @foreach (var page in Model.Items)
+        {
+            if (page.IsCurrent)
+            {
+                <li class="page-item @(page.Active)" aria-current="page">
+                    <a class="page-link" data-page="@(page.Index)" href="javascript:void(0)">@(page.Index)</a>
+                </li>
+            }
+            else
+            {
+                <li class="page-item">
+                    <a class="page-link" data-page="@(page.Index)" href="javascript:void(0)">@(page.Index)</a>
+                </li>
+            }
+        }
+        <li class="page-item @(Model.DisableNext)">
+            <a class="page-link" data-page="@(Model.Next)" href="javascript:void(0)">Next</a>
+        </li>
+    </ul>
+</nav>
