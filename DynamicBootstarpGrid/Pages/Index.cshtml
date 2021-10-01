@@ -7,14 +7,19 @@
 <h2>Employees</h2>
 <div class="row mt-2">
     <div class="col-sm-12 col-xl-12">
-        <form method="post" id="form-pagination">
-            <input type="search" asp-for="GridParams.Search" class="mb-2" autocomplete="off" />
-            <input type="hidden" asp-for="GridParams.Current" />
-            <input type="hidden" asp-for="GridParams.Total" />
-            <input type="hidden" asp-for="GridParams.Col" />
-            <input type="hidden" asp-for="GridParams.Dir" />
-            <input type="submit" id="btn-form-pagination" class="d-none" />
-        </form>
+        <div class="row">
+            <form method="post" id="form-pagination">
+                <div class="col-sm-12 col-xl-12">
+                    <input type="search" asp-for="GridParams.Search" class="mb-2 float-sm-start" autocomplete="off" />
+                    <input type="hidden" asp-for="GridParams.Current" />
+                    <input type="hidden" asp-for="GridParams.Total" />
+                    <input type="hidden" asp-for="GridParams.Col" />
+                    <input type="hidden" asp-for="GridParams.Dir" /> 
+                    <input type="submit" id="btn-form-pagination" class="d-none" />
+                    <select asp-items="Model.RecordsSelectList" asp-for="GridParams.PerPageRecords" class="mb-2 float-sm-end"></select>
+                </div> 
+            </form>
+        </div>
         <div class="table-responsive">
             <table class="table table-bordered border-primary">
                 <thead>
@@ -76,6 +81,11 @@
             $("#GridParams_Dir").val(dir);
             $("#GridParams_Col").val($this.data("col"));
             $("#btn-form-pagination").click();
+        });
+        $(function () {
+            $("#GridParams_PerPageRecords").change(function () {
+                $("#btn-form-pagination").click();
+            });
         });
     </script>
 }

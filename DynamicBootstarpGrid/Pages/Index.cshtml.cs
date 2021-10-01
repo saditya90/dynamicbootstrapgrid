@@ -2,6 +2,7 @@
 using Faker;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
@@ -20,11 +21,18 @@ namespace DynamicBootstarpGrid.Pages
         /// This variable can be load from configuration.
         /// To make it more dynamic it should get load from datastore.
         /// </summary>
-        private const int RecordsPerPage = 10;
+        private static int RecordsPerPage = 10;
         public List<Employee> Data { get; set; } = new List<Employee>();
         [BindProperty(SupportsGet = true)]
         public GridIndex GridParams { get; set; } = new GridIndex();
         public Pagination Pagination { get; set; } = new Pagination();
+        public List<SelectListItem> RecordsSelectList { get; set; } = new List<SelectListItem> {
+          new SelectListItem { Text = "10", Value = "10" },
+          new SelectListItem { Text = "20", Value = "20" },
+          new SelectListItem { Text = "30", Value = "30" },
+          new SelectListItem { Text = "40", Value = "40" },
+          new SelectListItem { Text = "50", Value = "50" }
+        };
         public IndexModel(ILogger<IndexModel> logger, IMemoryCache memoryCache)
         {
             _logger = logger;
@@ -38,7 +46,8 @@ namespace DynamicBootstarpGrid.Pages
 
         private void InitilizeData(GridIndex gridIndex)
         {
-            int totalPages;
+            int totalPages; RecordsPerPage = gridIndex.PerPageRecords;
+            GridParams.PerPageRecords = gridIndex.PerPageRecords;
             if (_memoryCache.TryGetValue(DataCacheKey, out List<Employee> data))
             {
                 Data = data;
@@ -49,11 +58,11 @@ namespace DynamicBootstarpGrid.Pages
             }
 
             ApplyFilter(gridIndex);
-            
+
             ApplySorting(gridIndex);
 
             totalPages = Data.Count % RecordsPerPage == 0 ? Data.Count / RecordsPerPage : (Data.Count / RecordsPerPage) + 1;
-            
+
             GridParams.Current = gridIndex.Current; GridParams.Total = totalPages;
 
             if (gridIndex.Current == 1)
@@ -64,7 +73,7 @@ namespace DynamicBootstarpGrid.Pages
             }
 
             Data = Data.Skip(RecordsPerPage * (gridIndex.Current - 1)).Take(RecordsPerPage).ToList();
-            
+
             FillPagination(gridIndex, totalPages);
         }
 
@@ -92,7 +101,7 @@ namespace DynamicBootstarpGrid.Pages
                     q.Name.Contains(gridIndex.Search, ignoreCase) ||
                     q.SecurityNo.Contains(gridIndex.Search, ignoreCase)).ToList();
 
-                GridParams.Search = gridIndex.Search; 
+                GridParams.Search = gridIndex.Search;
                 gridIndex.Current = 1; GridParams.Current = 1;
             }
         }
@@ -128,7 +137,7 @@ namespace DynamicBootstarpGrid.Pages
                 if (Pagination.Items.Count == 3) break;
             }
             Pagination.Next = Pagination.IsNextDisabled ? "" : (gridIndex.Current + 1).ToString();
-            Pagination.Prev = Pagination.IsPreviousDisabled ? "" : (gridIndex.Current -1).ToString();
+            Pagination.Prev = Pagination.IsPreviousDisabled ? "" : (gridIndex.Current - 1).ToString();
         }
 
         public IActionResult OnPost()
@@ -137,7 +146,8 @@ namespace DynamicBootstarpGrid.Pages
                 { "gridIndex.Current", GridParams.Current },
                 { "gridIndex.Search", GridParams.Search },
                 { "gridIndex.Col", GridParams.Col },
-                { "gridIndex.Dir", GridParams.Dir }
+                { "gridIndex.Dir", GridParams.Dir },
+                { "gridIndex.PerPageRecords", GridParams.PerPageRecords }
             });
         }
 
@@ -148,6 +158,7 @@ namespace DynamicBootstarpGrid.Pages
             public string Search { get; set; }
             public string Col { get; set; } = "Name";
             public string Dir { get; set; } = "asc";
+            public int PerPageRecords { get; set; } = 10;
         }
 
         public class Employee
